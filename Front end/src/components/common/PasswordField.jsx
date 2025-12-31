@@ -30,7 +30,7 @@ export default function PasswordField({ name }) {
                 shrink
                 htmlFor={name}
                 sx={{
-                    color: "black",
+                    color: "text.primary",
                     fontWeight: 500,
                     mb: 0.5,
                     position: "static",
