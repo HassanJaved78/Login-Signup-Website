@@ -10,8 +10,8 @@ export default function ThemeToggle() {
     const { mode = "system", setMode } = useColorScheme();
 
     return (
-        <Box sx={{ width: 180, display: "flex", alignItems:"center", gap: 2 }}>
-            <Typography>Theme</Typography>
+        <Box sx={{ width: 120, display: "flex", alignItems:"center", gap: 2 }}>
+            {/* <Typography>Theme</Typography> */}
             <FormControl fullWidth size="small" >
                 <Select
                     value={mode}
@@ -19,6 +19,7 @@ export default function ThemeToggle() {
                     onClose={(event) => event.target}
                     sx={{
                         color: "white", 
+                        border: 1,
                         ".MuiSelect-icon": { color: "white" }, // make dropdown arrow white
                     }}
                 >

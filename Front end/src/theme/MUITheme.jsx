@@ -51,7 +51,20 @@ const theme = createTheme({
             textTransform: "none",
         },
     },
-    });
+
+    // 4. Global Components Setting
+    components: {
+        MuiOutlinedInput: {
+            styleOverrides: {
+                input: {
+                    textIndent: 6
+                },
+            }
+        }
+    }
+    }
+);
+    
 
 export default theme;
 

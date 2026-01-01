@@ -1,12 +1,12 @@
 import './App.css'
-
-import AuthLayout from './components/layout/AuthLayout';
+import { RouterProvider } from 'react-router-dom';
+import router from './routes/AppRoutes'; 
 
 function App() {
 
   return (
     <>
-      <AuthLayout />
+      <RouterProvider router={router} />
     </>
   )
 }
