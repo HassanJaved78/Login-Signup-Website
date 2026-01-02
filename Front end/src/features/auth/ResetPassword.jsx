@@ -15,8 +15,8 @@ export default function ResetPassword() {
             </Typography>
 
             <Stack spacing={2} sx={{ paddingY: 2 }} >
-                <PasswordField name="New Password" />
-                <PasswordField name="Confirm Password" />
+                <PasswordField label="New Password" />
+                <PasswordField label="Confirm Password" />
             </Stack>
 
             <RoundButton text="Reset Password" clickHandler={() => console.log("hi")} />

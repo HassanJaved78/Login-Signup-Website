@@ -14,9 +14,13 @@ const StyledTextField = styled(TextField)({
         borderRadius: 30,
         height: 52,
     },
+    "& .MuiFormHelperText-root": {
+        marginLeft: 0,       // align left with input box
+        height: "0.5rem"
+    },
 });
 
-export default function PasswordField({ name }) {
+export default function PasswordField({ label, name, value, changeHandler, error }) {
 
     const [ showPass, setShowPass ] = useState(false);
 
@@ -28,7 +32,7 @@ export default function PasswordField({ name }) {
         <FormControl fullWidth>
             <InputLabel
                 shrink
-                htmlFor={name}
+                htmlFor={label}
                 sx={{
                     color: "text.primary",
                     fontWeight: 500,
@@ -37,15 +41,20 @@ export default function PasswordField({ name }) {
                     transform: "none",
                 }}
             >
-                {name}
+                {label}
             </InputLabel>
 
             <StyledTextField
                 variant="outlined"
                 fullWidth
-                id={name}
+                id={label}
                 type={showPass ? "text" : "password"}
-                placeholder={name}
+                name={name}
+                value={value}
+                onChange={changeHandler}
+                placeholder={label}
+                error={error}
+                helperText={error || " "}
                 slotProps={{
                     input: {
                         endAdornment: (

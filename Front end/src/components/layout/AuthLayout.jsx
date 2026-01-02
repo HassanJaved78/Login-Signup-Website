@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import RegisterImage from "../../assets/images/AuthImages/Register_Page.png";
 import LoginImage from "../../assets/images/AuthImages/Login_Page.png";
@@ -40,6 +40,13 @@ export default function AuthLayout() {
     const layout = location.pathname.split('/').reverse()[0];  //used this to split the path name on "/" and then get the last path
     // console.log(layout);
 
+    const navigate = useNavigate();
+
+    const goBack = () => {
+        console.log("back");
+        navigate(-1);
+    }
+
     return (
         <>
             <Box
@@ -60,7 +67,7 @@ export default function AuthLayout() {
                         borderRadius: 10,
                         display: "flex",
                         maxWidth: "1200px",
-                        minHeight: "88vh"
+                        minHeight: "80vh"
                     }}
                 >
                     {/* container for form and image */}
@@ -98,7 +105,7 @@ export default function AuthLayout() {
                                 width: "90%",
                             }}
                         >
-                            <KeyboardBackspaceRounded sx={{ fontSize: 20, cursor: "pointer", marginBottom: 4 }} />
+                            <KeyboardBackspaceRounded onClick={goBack} sx={{ fontSize: 20, cursor: "pointer", marginBottom: 4 }} />
                             
                             {/* Page specific form */}
                             

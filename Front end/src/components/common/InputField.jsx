@@ -8,14 +8,19 @@ const StytledTextField = styled(TextField)({
         borderRadius: 30,
         height: 52,
     },
+    "& .MuiFormHelperText-root": {
+        marginLeft: 0,       // align left with input box
+        height: "0.5rem"
+    },
 });
 
-export default function InputField({ name, type = "text" }) {
+export default function InputField({ name, label, type = "text", value, changeHandler, error }) {
     return (
         <FormControl fullWidth>
             <InputLabel
                 shrink
-                htmlFor={name}
+                // error={error}
+                htmlFor={label}
                 sx={{
                     color: "text.primary",
                     fontWeight: 500,
@@ -24,15 +29,22 @@ export default function InputField({ name, type = "text" }) {
                     transform: "none",
                 }}
             >
-                {name}
+                {label}
             </InputLabel>
 
             <StytledTextField
+                // error
+                // helperText="error"
                 variant="outlined"
                 fullWidth
-                id={name}
-                placeholder={name}
+                value={value}
+                onChange={changeHandler}
+                error={error}
+                helperText={error || " "}
+                id={label}
+                placeholder={label}
                 type={type}
+                name={name}
             />
         </FormControl>
     );

@@ -7,11 +7,13 @@ import Login from '../features/auth/Login';
 import ForgotPassword from '../features/auth/ForgotPassword';
 import ResetPassword from '../features/auth/ResetPassword';
 import OtpVerification from '../features/auth/OtpVerification';
+import RouteError from "./RouteError";
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <MainLayout />,
+        errorElement: <RouteError />,
         children: [
             {
                 element: <AuthLayout />,

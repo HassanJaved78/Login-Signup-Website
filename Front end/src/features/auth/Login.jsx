@@ -15,12 +15,70 @@ import InputField from "../../components/common/InputField";
 import PasswordField from "../../components/common/PasswordField";
 import RoundButton from "../../components/common/RoundButton";
 
-import { useNavigation, NavLink } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, NavLink } from "react-router-dom";
 
 export default function Login() {
 
-    const navigate = useNavigation();
+    const [ form, setForm ] = useState({
+        email: "",
+        pass: ""
+    });
 
+    const [ emailError, setEmailError ] = useState();
+    const [ passError, setPassError ] = useState();
+
+    const validateEmail = (value) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!regex.test(value)){
+            setEmailError("Invalid Email");
+            return false;
+        }
+        else {
+            setEmailError("");
+            return true;
+        }
+    };
+
+    const validatePass = (value) => {
+        
+        if (value.length < 8) {
+            setPassError("Password must be at least 8 characters");
+            return false;
+        }
+        else {
+            setPassError("");
+            return true;
+        }
+    };
+    
+    const handleChange = (e) => {
+        const { name,  value } = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: value
+        })
+        )
+
+        if ( name === "email" ) {
+            validateEmail(value);
+        }
+        if ( name === "pass" ) {
+            validatePass(value)
+        }
+    }
+
+    const navigate = useNavigate();
+
+    const handleLogin = () => {
+        
+        if(validateEmail(form.email) && validatePass(form.pass) ) {
+            alert("logged in");
+        }
+    }
+    
     return (
         <Stack spacing={3}>
 
@@ -40,8 +98,23 @@ export default function Login() {
             </Typography>
 
             <Stack spacing={2} sx={{ paddingY: 2 }} >
-                <InputField name="Email Address" type="email" />
-                <PasswordField name="Password" />
+                <InputField 
+                    name="email"
+                    label="Email Address" 
+                    type="email"
+                    value={form.email}
+                    changeHandler={handleChange}
+                    error={emailError}
+                />
+
+                <PasswordField 
+                    label="Password"
+                    name="pass"
+                    value={form.pass}
+                    changeHandler={handleChange} 
+                    error={passError}
+                />
+
                 <NavLink to="/forgotpassword" style={{
                     textDecoration: "underline",
                     textUnderlineOffset: 2,
@@ -54,7 +127,7 @@ export default function Login() {
                 </NavLink>
             </Stack>
 
-            <RoundButton text="Log in" clickHandler={() => console.log("hi")} />
+            <RoundButton text="Log in" clickHandler={handleLogin} />
 
             <FormControlLabel
                 control={
@@ -78,7 +151,7 @@ export default function Login() {
                                 textUnderlineOffset: 2,
                                 marginLeft: 0.5,
                             }}
-                            href="#"
+                            href=""
                             onClick={(e) => e.stopPropagation()} //
                         >
                             <Typography variant="body2" sx={{ fontWeight: 600 }} >Terms & Condition</Typography>

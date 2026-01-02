@@ -15,7 +15,7 @@ export default function ForgotPassword() {
             </Typography>
 
             <Stack spacing={2} sx={{ paddingY: 2 }} >
-                <InputField name="Email Address" type="email" />
+                <InputField label="Email Address" type="email" />
             </Stack>
 
             <RoundButton text="Send Verification Code" clickHandler={() => console.log("hi")} />

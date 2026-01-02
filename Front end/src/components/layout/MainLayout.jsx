@@ -9,12 +9,12 @@ import ThemeToggle from "../common/ThemeToggle";
 export default function MainLayout() {
     return (
         <>  
-            <AppBar position="sticky" >
+            <AppBar position="static" >
             {/* <AppBar position="static" > */}
                 <Toolbar
                     sx={{
                         justifyContent: "space-between",
-                        alignItems: "text-baseline"
+                        alignItems: "text-baseline",
                     }} 
                 >
                     <Typography>
