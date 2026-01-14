@@ -113,11 +113,19 @@ export default function Register() {
     }
 
     const toogleCheckBox = () => {
-        setForm((prev) => ({
-            ...prev,
-            termsChecked: !prev.termsChecked
-        }))
-        validateCheckBox();
+        setForm((prev) => {
+            const nextChecked = !prev.termsChecked;
+
+            setError((e) => ({
+                ...e,
+                terms: nextChecked ? "" : "You must agree to the terms",
+            }));
+
+            return {
+                ...prev,
+                termsChecked: nextChecked
+            }
+        })
     }
 
     const validateCheckBox = () => {

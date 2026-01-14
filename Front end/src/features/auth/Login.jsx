@@ -129,7 +129,7 @@ export default function Login() {
 
             <RoundButton text="Log in" clickHandler={handleLogin} />
 
-            <FormControlLabel
+            {/* <FormControlLabel
                 control={
                     <Checkbox
                         sx={{
@@ -158,7 +158,7 @@ export default function Login() {
                         </Link>
                     </Stack>
                 }
-            />
+            /> */}
 
             <Divider>
                 <Typography sx={{ color: "grey" }}>or</Typography>
