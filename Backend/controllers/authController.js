@@ -6,6 +6,8 @@ import { generateAccessToken, generateRefreshToken } from "../utils/generateToke
 import { ObjectId } from "mongodb";
 import { accessCookieOptions, refreshCookieOptions } from "../utils/cookieOptions.js";
 import { isValidEmail } from "../utils/validateEmail.js";
+import { generateOTP } from "../utils/generateOTP.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const register = async (req, res) => {
     console.log("register called");
@@ -108,7 +110,7 @@ export const login = async (req, res) => {
         res.json({ success: true });
     }
     catch (error) {
-        console.error("REGISTER ERROR:", error);
+        console.error("LOGIN ERROR:", error);
         res.status(500).json({ message: "Internal Server Error. Please try again." })
     }
 }
@@ -141,7 +143,7 @@ export const logout = async (req, res) => {
         res.json({ success: true });
     }
     catch (error) {
-        console.error("REGISTER ERROR:", error);
+        console.error("LOGOUT ERROR:", error);
         res.status(500).json({ message: "Internal Server Error. Please try again." })
     }
 }
@@ -177,8 +179,8 @@ export const refresh = async (req, res) => {
         const newRefreshToken = generateRefreshToken(user._id);
 
         await users.updateOne(
-            {_id: user._id},
-            {$set: { refreshToken: newRefreshToken }}
+            { _id: user._id },
+            { $set: { refreshToken: newRefreshToken } }
         )
 
         res.cookie("accessToken", newAccessToken, accessCookieOptions);
@@ -187,8 +189,137 @@ export const refresh = async (req, res) => {
         res.json({ success: true });
     }
     catch (error) {
-        console.error("REGISTER ERROR:", error);
+        console.error("REFRESH ERROR:", error);
         res.status(500).json({ message: "Internal Server Error. Please try again." })
     }
 
 }
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const users = getUsersCollection();
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                message: "Email and password cannot be empty."
+            })
+        }
+
+        if (!isValidEmail(email)) {
+            return res.status(400).json({ message: "Email is not valid" });
+        }
+
+        const user = await users.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const otp = generateOTP();
+
+        await users.updateOne(
+            { _id: user._id },
+            {
+                $set: {
+                    resetPasswordToken: otp,
+                    resetPasswordExpires: Date.now() + 2 * 60 * 1000
+                }
+            }
+        );
+
+        await sendEmail(
+            email,
+            otp
+        );
+
+        res.json({
+            message: "Reset OTP sent"
+        });
+
+    }
+    catch (error) {
+        console.error("Forgot ERROR:", error);
+        res.status(500).json({ message: "Internal Server Error. Please try again." })
+    }
+}
+
+export const verifyOTP = async (req, res) => {
+    try {
+        const users = getUsersCollection();
+        const { email, otp } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                message: "Email and password cannot be empty."
+            })
+        }
+
+        if (!isValidEmail(email)) {
+            return res.status(400).json({ message: "Email is not valid" });
+        }
+
+        const user = await users.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (
+            user.resetPasswordToken !== otp ||
+            user.resetPasswordExpires < Date.now()
+        ) {
+            return res.status(400).json({ message: "Invalid or expired OTP" });
+        }
+
+        await users.updateOne(
+            { _id: user._id },
+            {
+                $set: {
+                    resetPasswordExpires: Date.now() + 5 * 60 * 1000
+                }
+            }
+        );
+
+        res.json({
+            message: "Account verified successfully"
+        });
+    }
+    catch (error) {
+        console.error("Forgot ERROR:", error);
+        res.status(500).json({ message: "Internal Server Error. Please try again." })
+    }
+}
+
+export const resetPassword = async (req, res) => {
+
+    const users = getUsersCollection();
+    const { email, otp, newPassword } = req.body;
+
+    const user = await users.findOne({ email });
+
+    if (
+        user.resetPasswordToken !== otp ||
+        user.resetPasswordExpires < Date.now()
+    ) {
+        return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    const password = await bcrypt.hash(newPassword, 12);
+
+    await users.updateOne(
+        { _id: user._id },
+        {
+            $set: {
+                password,
+                resetPasswordToken: null,
+                resetPasswordExpires: null,
+            }
+        }
+    );
+
+    res.json({
+        message: "Password reset successful"
+    });
+
+};

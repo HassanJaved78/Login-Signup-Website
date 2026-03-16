@@ -20,9 +20,13 @@ import RoundButton from "../../components/common/RoundButton";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
+import { useRegisterMutation } from '../../app/services/authSlice.js';
+
 export default function Register() {
 
-    const [ error, setError ] = useState({
+    const [registerUser, { isLoading }] = useRegisterMutation();
+
+    const [error, setError] = useState({
         firstName: "",
         lastName: "",
         email: "",
@@ -30,7 +34,7 @@ export default function Register() {
         terms: ""
     });
 
-    const [ form, setForm ] = useState({
+    const [form, setForm] = useState({
         firstName: "",
         lastName: "",
         email: "",
@@ -39,7 +43,7 @@ export default function Register() {
     })
 
     const handleChange = (e) => {
-        const { name,  value } = e.target;
+        const { name, value } = e.target;
 
         setForm((prev) => ({
             ...prev,
@@ -47,11 +51,11 @@ export default function Register() {
         })
         )
 
-        if ( name === "email" ) {
+        if (name === "email") {
             validateEmail(value);
             return;
         }
-        if ( name === "pass" ) {
+        if (name === "pass") {
             validatePass(value);
             return;
         }
@@ -61,8 +65,8 @@ export default function Register() {
 
     const validateEmail = (value) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!regex.test(value)){
+
+        if (!regex.test(value)) {
             setError((prev) => ({
                 ...prev,
                 email: "Invalid Email"
@@ -79,7 +83,7 @@ export default function Register() {
     };
 
     const validatePass = (value) => {
-        
+
         if (value.length < 8) {
             setError((prev) => ({
                 ...prev,
@@ -138,7 +142,7 @@ export default function Register() {
         }
     }
 
-    const createAccount = () => {
+    const createAccount = async () => {
         const firstNameValid = validateName("firstName", form.firstName);
         const lastNameValid = validateName("lastName", form.lastName);
         const emailValid = validateEmail(form.email);
@@ -146,7 +150,20 @@ export default function Register() {
         const termsValid = validateCheckBox();
 
         if (firstNameValid && lastNameValid && emailValid && passValid && termsValid) {
-            alert("Account created successfully");
+            try {
+                const res = await registerUser({
+                    name: form.firstName + form.lastName,
+                    email: form.email,
+                    password: form.pass
+                }).unwrap();
+
+                // alert("Account creating successfull");
+                console.log(res);
+            }
+            catch (err) {
+                alert(err.data.message);
+                console.error(err);
+            }
         }
     };
 
@@ -182,9 +199,9 @@ export default function Register() {
                 <PasswordField name="pass" value={form.pass} changeHandler={handleChange} error={error.pass} label="Password" />
             </Stack>
 
-            <RoundButton text="Create Account" clickHandler={createAccount} />
+            <RoundButton text={isLoading ? "Creating..." : "Create Account"} disabled={isLoading} clickHandler={createAccount} />
 
-            <FormControl error={error.terms}>
+            <FormControl error={!!error.terms}>
                 <FormControlLabel
                     control={
                         <Checkbox
@@ -280,6 +297,6 @@ export default function Register() {
                 </Grid>
             </Grid>
 
-        </Stack> 
+        </Stack>
     )
 }

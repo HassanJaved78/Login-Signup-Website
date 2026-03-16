@@ -18,20 +18,24 @@ import RoundButton from "../../components/common/RoundButton";
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 
+import { useLoginMutation } from "../../app/services/authSlice";
+
 export default function Login() {
 
-    const [ form, setForm ] = useState({
+    const [loginUser, { isLoading }] = useLoginMutation();
+
+    const [form, setForm] = useState({
         email: "",
         pass: ""
     });
 
-    const [ emailError, setEmailError ] = useState();
-    const [ passError, setPassError ] = useState();
+    const [emailError, setEmailError] = useState();
+    const [passError, setPassError] = useState();
 
     const validateEmail = (value) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!regex.test(value)){
+
+        if (!regex.test(value)) {
             setEmailError("Invalid Email");
             return false;
         }
@@ -42,7 +46,7 @@ export default function Login() {
     };
 
     const validatePass = (value) => {
-        
+
         if (value.length < 8) {
             setPassError("Password must be at least 8 characters");
             return false;
@@ -52,9 +56,9 @@ export default function Login() {
             return true;
         }
     };
-    
+
     const handleChange = (e) => {
-        const { name,  value } = e.target;
+        const { name, value } = e.target;
 
         setForm((prev) => ({
             ...prev,
@@ -62,23 +66,33 @@ export default function Login() {
         })
         )
 
-        if ( name === "email" ) {
+        if (name === "email") {
             validateEmail(value);
         }
-        if ( name === "pass" ) {
+        if (name === "pass") {
             validatePass(value)
         }
     }
 
     const navigate = useNavigate();
 
-    const handleLogin = () => {
-        
-        if(validateEmail(form.email) && validatePass(form.pass) ) {
-            alert("logged in");
+    const handleLogin = async () => {
+
+        if (validateEmail(form.email) && validatePass(form.pass)) {
+            // alert("logged in");
+            try {
+                const res = await loginUser({
+                    email: form.email,
+                    password: form.pass
+                }).unwrap();
+                alert("Login successfull");
+            }
+            catch (err) {
+                alert(err.data.message)
+            }
         }
     }
-    
+
     return (
         <Stack spacing={3}>
 
@@ -98,20 +112,20 @@ export default function Login() {
             </Typography>
 
             <Stack spacing={2} sx={{ paddingY: 2 }} >
-                <InputField 
+                <InputField
                     name="email"
-                    label="Email Address" 
+                    label="Email Address"
                     type="email"
                     value={form.email}
                     changeHandler={handleChange}
                     error={emailError}
                 />
 
-                <PasswordField 
+                <PasswordField
                     label="Password"
                     name="pass"
                     value={form.pass}
-                    changeHandler={handleChange} 
+                    changeHandler={handleChange}
                     error={passError}
                 />
 
@@ -219,6 +233,6 @@ export default function Login() {
                 </Grid>
             </Grid>
 
-        </Stack> 
+        </Stack>
     )
 }

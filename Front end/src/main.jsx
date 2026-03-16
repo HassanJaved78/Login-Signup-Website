@@ -5,13 +5,18 @@ import App from './App.jsx'
 
 import { CssBaseline, ThemeProvider } from '@mui/material'
 
+import { store } from "./app/store.js";
+import { Provider } from "react-redux";
+
 import theme from "./theme/MUITheme.jsx";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider theme={theme} defaultMode='system' >
       <CssBaseline />
-      <App />
+      <Provider store={store}>
+        <App />
+      </Provider>
     </ThemeProvider>
   </StrictMode>,
 )
