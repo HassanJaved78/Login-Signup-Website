@@ -15,7 +15,7 @@ This project is a full-stack authentication system built using the MERN stack (*
 - JWT Authentication (Access & Refresh Tokens)  
 - Secure cookie handling  
 - XSS & NoSQL Injection protection  
-- Rate limiting & security headers  
+- Rate limiting & security headers    
 
 The application follows best practices for **security, scalability, and clean architecture** by separating frontend and backend into independent modules.
 
@@ -51,16 +51,13 @@ The application follows best practices for **security, scalability, and clean ar
 | Library | Purpose in Project |
 |--------|------------------|
 | react | Core frontend library |
-| react-dom | Renders React components to the DOM |
 | vite | Fast frontend build tool |
 | react-router-dom | Handles routing between pages |
 | @reduxjs/toolkit | Manages global authentication state |
 | react-redux | Connects Redux store with React components |
 | @mui/material | Provides modern UI components |
 | @mui/icons-material | Material UI icons |
-| @emotion/react & @emotion/styled | Styling engine used by MUI |
 | dotenv | Loads frontend environment variables |
-| eslint | Maintains code quality |
 
 ---
 
@@ -128,7 +125,7 @@ The backend ensures that all sensitive operations are secure and production-read
 Follow these steps carefully.
 
 🔹 STEP 1: Clone the Repository
-git clone <your-repository-url>
+git clone https://github.com/HassanJaved78/Login-Signup-Website.git
 cd Login-and-Signup
 🔹 STEP 2: Setup & Run Backend (FIRST)
 1️⃣ Go to Backend folder
@@ -217,7 +214,7 @@ Email verification
 
 Input validation
 
-📌 Future Improvements (Optional Ideas)
+📌 Future Improvements
 
 Google OAuth login
 
@@ -232,3 +229,41 @@ CI/CD integration
 👨‍💻 Author
 
 Developed as a full-stack authentication system demonstrating secure production-level authentication architecture.
+
+✉️ 6️⃣ How to Get Your OTP for Verification
+
+Currently, the system uses NodeMailer with Ethereal Email for testing OTP delivery. This means the OTP email is not sent to a real email inbox, but instead a test email link appears in your backend terminal.
+
+Steps to Access Your OTP:
+
+Register a new user on your frontend app.
+
+Check your backend terminal after submission — you will see a log like this:
+
+Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+
+Copy the Preview URL and open it in your browser.
+
+The page will display the OTP sent to the user email.
+
+Enter this OTP in the frontend OTP verification form to complete registration.
+
+⚠️ Note: This is for testing only. In production, you would configure NodeMailer with a real email service (like Gmail, SendGrid, or SMTP) to send OTPs directly to users’ inboxes.
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Registration Page
+![Registration Page](screenshots/registration.png)
+
+### Login Page
+![Login Page](screenshots/login.png)
+
+### Forgot Password Page
+![Forgot Password](screenshots/forgot-password.png)
+
+### OTP Verification Page
+![OTP Verification](screenshots/otp_verification.png)
+
+### Reset Password Page
+![Reset Password](screenshots/reset-password.png)
