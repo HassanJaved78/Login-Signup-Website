@@ -290,3 +290,10 @@ Steps to Access Your OTP:
 
 ### Reset Password Page
 ![Reset Password](screenshots/reset-password.png)
+
+
+
+## Links
+
+### Design link
+https://dribbble.com/shots/26399338-Login-And-Sign-up-Screens
