@@ -65,57 +65,64 @@ The application follows best practices for **security, scalability, and clean ar
 
 The frontend is built using **React + Vite** and follows a clean folder structure:
 
+```
 components/      → Reusable UI components (InputField, PasswordField, Buttons, Layouts)
 features/auth/   → Authentication pages (Login, Register, OTP, Forgot Password, Reset Password)
 app/             → Redux store and API slices
 routes/          → Application routing setup
 theme/           → Material UI theme customization
 utils/           → Helper functions for managing user state
+```
+
 ✨ Key Features:
 
-Modern UI using Material UI (MUI)
+- Modern UI using Material UI (MUI)
 
-Dark/Light theme toggle
+- Dark/Light theme toggle
 
 Redux Toolkit for authentication state management
 
-Protected routes
+- Protected routes
 
-Automatic token refresh handling
+- Automatic token refresh handling
 
-Clean and responsive layout
+- Clean and responsive layout
 
-The frontend communicates with the backend via secure HTTP-only cookies.
+- The frontend communicates with the backend via secure HTTP-only cookies.
+
+---
 
 ## 🖥 4️⃣ Backend Overview
 
 The backend is built with Node.js + Express and follows a modular architecture:
-
+```
 controllers/ → Business logic for authentication
 routes/      → API route definitions
 models/      → MongoDB database logic
 middleware/  → Authentication, sanitization, XSS protection
 utils/       → Helper functions (OTP generation, email sending, token generation)
 config.js/   → Database connection
+```
+
 🔐 Backend Security Features:
 
-Password hashing with bcrypt
+- Password hashing with bcrypt
 
 JWT Access & Refresh Tokens
 
-HTTP-only cookies
+- HTTP-only cookies
 
-Email OTP verification
+- Email OTP verification
 
-Rate limiting
+- Rate limiting
 
-Helmet security headers
+- Helmet security headers
 
-XSS protection
+- XSS protection
 
-NoSQL injection protection
+- NoSQL injection protection
 
-Input validation
+- Input validation
 
 The backend ensures that all sensitive operations are secure and production-ready.
 
@@ -124,19 +131,26 @@ The backend ensures that all sensitive operations are secure and production-read
 Follow these steps carefully.
 
 🔹 STEP 1: Clone the Repository
+```
 git clone https://github.com/HassanJaved78/Login-Signup-Website.git
 cd Login-and-Signup
+```
 🔹 STEP 2: Setup & Run Backend (FIRST)
 1️⃣ Go to Backend folder
+```
 cd Backend
+```
 2️⃣ Install dependencies
+
+```
 npm install
+```
 3️⃣ Setup Environment Variables
 
 Create a .env file inside the Backend folder.
 
 You can copy from example.env and update the values.
-
+```
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_ACCESS_SECRET=your_access_secret
@@ -144,17 +158,18 @@ JWT_REFRESH_SECRET=your_refresh_secret
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_email_password
 CLIENT_URL=http://localhost:5173
-
+```
 ⚠️ Make sure MongoDB is running (local or cloud Atlas).
 
 4️⃣ Start Backend Server
+```
 npm run dev
-
+```
 If successful, you should see:
-
+```
 Server running on port 5000
 Database connected successfully
-
+```
 Leave this terminal running.
 
 🔹 STEP 3: Setup & Run Frontend
@@ -162,72 +177,82 @@ Leave this terminal running.
 Open a new terminal window.
 
 1️⃣ Go to Frontend folder
+```
 cd Front end
+```
 2️⃣ Install dependencies
+```
 npm install
+```
 3️⃣ Setup Frontend Environment Variables
 
 Create a .env file inside Front end folder.
-
+```
 VITE_BASE_URL=http://localhost:5000/api
+```
 4️⃣ Start Frontend
+```
 npm run dev
-
+```
 You will see something like:
-
+```
 Local: http://localhost:5173/
-
+```
 Open that URL in your browser.
 
 ✅ Now Your Project Is Running!
-
+```
 Backend → http://localhost:5000
 
 Frontend → http://localhost:5173
-
+```
 You can now:
 
-Register a new user
+- Register a new user
 
-Verify OTP via email
+- Verify OTP via email
 
-Login
+- Login
 
-Reset password
+- Reset password
 
-🛡 Security Features Implemented
+### 🛡 Security Features Implemented
 
-Password hashing
+- Password hashing
 
-Access & refresh token system
+- Access & refresh token system
 
-HTTP-only secure cookies
+- HTTP-only secure cookies
 
-Rate limiting
+- Rate limiting
 
-XSS protection
+- XSS protection
 
-NoSQL injection prevention
+- NoSQL injection prevention
 
-Email verification
+- Email verification
 
-Input validation
+- Input validation
 
-📌 Future Improvements
+### 📌 Future Improvements
 
-Google OAuth login
+- Google OAuth login
 
-Role-based authentication (Admin/User)
+- Role-based authentication (Admin/User)
 
-Account lockout after multiple failed logins
+- Account lockout after multiple failed logins
 
-Docker deployment
+- Docker deployment
 
-CI/CD integration
+- CI/CD integration
+
+---
 
 👨‍💻 Author
 
 Developed as a full-stack authentication system demonstrating secure production-level authentication architecture.
+
+---
 
 ## ✉️ 6️⃣ How to Get Your OTP for Verification
 
@@ -235,22 +260,21 @@ Currently, the system uses NodeMailer with Ethereal Email for testing OTP delive
 
 Steps to Access Your OTP:
 
-Register a new user on your frontend app.
+- Register a new user on your frontend app.
 
-Check your backend terminal after submission — you will see a log like this:
+- Check your backend terminal after submission — you will see a log like this:
 
-Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+- Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 
-Copy the Preview URL and open it in your browser.
+- Copy the Preview URL and open it in your browser.
 
-The page will display the OTP sent to the user email.
+- The page will display the OTP sent to the user email.
 
-Enter this OTP in the frontend OTP verification form to complete registration.
+- Enter this OTP in the frontend OTP verification form to complete registration.
 
 ⚠️ Note: This is for testing only. In production, you would configure NodeMailer with a real email service (like Gmail, SendGrid, or SMTP) to send OTPs directly to users’ inboxes.
 
-### Dashboard
-![Dashboard](screenshots/dashboard.png)
+---
 
 ### Registration Page
 ![Registration Page](screenshots/registration.png)
