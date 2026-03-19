@@ -65,7 +65,6 @@ The application follows best practices for **security, scalability, and clean ar
 
 The frontend is built using **React + Vite** and follows a clean folder structure:
 
-```bash
 components/      → Reusable UI components (InputField, PasswordField, Buttons, Layouts)
 features/auth/   → Authentication pages (Login, Register, OTP, Forgot Password, Reset Password)
 app/             → Redux store and API slices
@@ -88,7 +87,7 @@ Clean and responsive layout
 
 The frontend communicates with the backend via secure HTTP-only cookies.
 
-🖥 4️⃣ Backend Overview
+## 🖥 4️⃣ Backend Overview
 
 The backend is built with Node.js + Express and follows a modular architecture:
 
@@ -120,7 +119,7 @@ Input validation
 
 The backend ensures that all sensitive operations are secure and production-ready.
 
-🚀 5️⃣ How To Run The Project (Step-by-Step Guide)
+## 🚀 5️⃣ How To Run The Project (Step-by-Step Guide)
 
 Follow these steps carefully.
 
@@ -230,7 +229,7 @@ CI/CD integration
 
 Developed as a full-stack authentication system demonstrating secure production-level authentication architecture.
 
-✉️ 6️⃣ How to Get Your OTP for Verification
+## ✉️ 6️⃣ How to Get Your OTP for Verification
 
 Currently, the system uses NodeMailer with Ethereal Email for testing OTP delivery. This means the OTP email is not sent to a real email inbox, but instead a test email link appears in your backend terminal.
 
