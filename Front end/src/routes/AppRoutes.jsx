@@ -8,6 +8,7 @@ import ForgotPassword from '../features/auth/ForgotPassword';
 import ResetPassword from '../features/auth/ResetPassword';
 import OtpVerification from '../features/auth/OtpVerification';
 import RouteError from "./RouteError";
+import Welcome from "../features/Welcome";
 
 const router = createBrowserRouter([
     {
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
         element: <MainLayout />,
         errorElement: <RouteError />,
         children: [
+            {
+                index: true,
+                element: <Welcome />
+            },
             {
                 element: <AuthLayout />,
                 children: [

@@ -1,17 +1,11 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { apiSlice } from "../apiSlice";
 
-export const authApi = createApi({
-    reducerPath: 'authApi',
-
-    baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:5000/auth",
-        credentials: "include"
-    }),
+export const authApi = apiSlice.injectEndpoints({
 
     endpoints: (builder) => ({
         register: builder.mutation({
             query: (data) => ({
-                url: '/register',
+                url: '/auth/register',
                 method: 'POST',
                 body: data
             })
@@ -19,7 +13,7 @@ export const authApi = createApi({
 
         login: builder.mutation({
             query: (data) => ({
-                url: '/login',
+                url: '/auth/login',
                 method: 'POST',
                 body: data
             })
@@ -27,7 +21,7 @@ export const authApi = createApi({
 
         logout: builder.mutation({
             query: (data) => ({
-                url: '/logout',
+                url: '/auth/logout',
                 method: 'POST',
                 body: data
             })
@@ -35,7 +29,7 @@ export const authApi = createApi({
 
         forgotPassword: builder.mutation({
             query: (data) => ({
-                url: '/forgot-password',
+                url: '/auth/forgot-password',
                 method: 'POST',
                 body: data
             })
@@ -43,7 +37,7 @@ export const authApi = createApi({
 
         verifyOTP: builder.mutation({
             query: (data) => ({
-                url: '/verify-otp',
+                url: '/auth/verify-otp',
                 method: 'POST',
                 body: data
             })
@@ -51,7 +45,7 @@ export const authApi = createApi({
 
         resetPassword: builder.mutation({
             query: (data) => ({
-                url: '/reset-password',
+                url: '/auth/reset-password',
                 method: 'POST',
                 body: data
             })

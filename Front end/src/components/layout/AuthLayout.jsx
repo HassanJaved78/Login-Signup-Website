@@ -43,7 +43,7 @@ export default function AuthLayout() {
     const navigate = useNavigate();
 
     const goBack = () => {
-        console.log("back");
+        // console.log("back");
         navigate(-1);
     }
 

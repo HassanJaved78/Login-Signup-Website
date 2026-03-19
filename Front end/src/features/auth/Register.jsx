@@ -20,11 +20,17 @@ import RoundButton from "../../components/common/RoundButton";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 
-import { useRegisterMutation } from '../../app/services/authSlice.js';
+import { useRegisterMutation } from '../../app/services/auth/authAPI.js';
+
+import { useNavigate } from "react-router-dom";
+
+import { useSetUser } from "../../utils/setUser.js";
 
 export default function Register() {
 
     const [registerUser, { isLoading }] = useRegisterMutation();
+    const navigate = useNavigate();
+    const setUser = useSetUser();
 
     const [error, setError] = useState({
         firstName: "",
@@ -157,12 +163,16 @@ export default function Register() {
                     password: form.pass
                 }).unwrap();
 
-                // alert("Account creating successfull");
-                console.log(res);
+                setUser(res.user);
+                alert("Account creating successfull");
+                // console.log(res);
+                navigate("/")
             }
             catch (err) {
-                alert(err.data.message);
                 console.error(err);
+
+                alert(err?.data?.message ||
+                    err?.error);
             }
         }
     };

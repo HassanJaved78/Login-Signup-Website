@@ -6,9 +6,15 @@ import RoundButton from "../../components/common/RoundButton";
 
 import { useState } from "react";
 
+import { useResetPasswordMutation } from "../../app/services/auth/authAPI";
+import { useNavigate } from "react-router-dom";
+
 export default function ResetPassword() {
 
-    const [ form, setForm ] = useState({
+    const [resetPass, { isLoading }] = useResetPasswordMutation();
+    const navigate = useNavigate();
+
+    const [form, setForm] = useState({
         pass: "",
         confirmPass: ""
     })
@@ -27,7 +33,7 @@ export default function ResetPassword() {
             setError(prev => ({ ...prev, pass: "Password must be at least 8 characters" }));
             return false;
         }
-        
+
         setError(prev => ({ ...prev, pass: "" }));
         return true;
     }
@@ -51,17 +57,29 @@ export default function ResetPassword() {
         }))
 
         setError(prev => ({
-        ...prev,
-        [name]: ""
-    }));
+            ...prev,
+            [name]: ""
+        }));
     }
 
-    const resetPassword = () => {
+    const resetPassword = async () => {
         let validPass = validatePass();
         let validConfirmPass = validateConfirmPass();
-        
-        if(validPass && validConfirmPass) {
-            alert("password resetted");
+
+        if (validPass && validConfirmPass) {
+            try {
+                const res = await resetPass({ newPassword: form.pass }).unwrap();
+                alert("password reset successfull, Login to continue");
+                navigate("/")
+            }
+            catch (err) {
+                alert(err?.data?.message);
+
+                if(err?.status === 403) {
+                    navigate("/")
+                }
+
+            }
         }
     }
 
@@ -75,15 +93,15 @@ export default function ResetPassword() {
             </Typography>
 
             <Stack spacing={2} sx={{ paddingY: 2 }} >
-                <PasswordField 
-                    label="New Password" 
+                <PasswordField
+                    label="New Password"
                     name="pass"
                     value={form.pass}
                     changeHandler={handleChange}
                     error={error.pass}
                 />
-                <PasswordField 
-                    label="Confirm Password" 
+                <PasswordField
+                    label="Confirm Password"
                     name="confirmPass"
                     value={form.confirmPass}
                     changeHandler={handleChange}
@@ -93,6 +111,6 @@ export default function ResetPassword() {
 
             <RoundButton text="Reset Password" clickHandler={resetPassword} />
 
-        </Stack> 
+        </Stack>
     )
 }

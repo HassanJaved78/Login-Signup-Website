@@ -3,8 +3,8 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
+// import FormControlLabel from "@mui/material/FormControlLabel";
+// import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import Box from "@mui/material/Box";
 
@@ -18,11 +18,14 @@ import RoundButton from "../../components/common/RoundButton";
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 
-import { useLoginMutation } from "../../app/services/authSlice";
+import { useLoginMutation } from "../../app/services/auth/authAPI.js";
+
+import {useSetUser} from "../../utils/setUser.js";
 
 export default function Login() {
 
     const [loginUser, { isLoading }] = useLoginMutation();
+    const setUser = useSetUser();
 
     const [form, setForm] = useState({
         email: "",
@@ -85,9 +88,13 @@ export default function Login() {
                     email: form.email,
                     password: form.pass
                 }).unwrap();
+                // console.log(res);
+                setUser(res.user);
                 alert("Login successfull");
+                navigate("/");
             }
             catch (err) {
+                // console.log(err)
                 alert(err.data.message)
             }
         }

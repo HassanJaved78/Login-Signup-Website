@@ -4,10 +4,12 @@ import jwt from "jsonwebtoken";
 import { getUsersCollection } from "../models/userModel.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/generateTokens.js";
 import { ObjectId } from "mongodb";
-import { accessCookieOptions, refreshCookieOptions } from "../utils/cookieOptions.js";
+import { accessCookieOptions, refreshCookieOptions, resetCookieOptions } from "../utils/cookieOptions.js";
 import { isValidEmail } from "../utils/validateEmail.js";
 import { generateOTP } from "../utils/generateOTP.js";
 import { sendEmail } from "../utils/sendEmail.js";
+
+import createReqID from "../utils/createReqID.js";
 
 export const register = async (req, res) => {
     console.log("register called");
@@ -57,7 +59,14 @@ export const register = async (req, res) => {
         res.cookie("accessToken", accessToken, accessCookieOptions);
         res.cookie("refreshToken", refreshToken, refreshCookieOptions);
 
-        res.json({ success: true });
+        res.json({
+            success: true,
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name
+            }
+        });
 
     }
     catch (error) {
@@ -107,7 +116,14 @@ export const login = async (req, res) => {
         res.cookie("accessToken", accessToken, accessCookieOptions);
         res.cookie("refreshToken", refreshToken, refreshCookieOptions);
 
-        res.json({ success: true });
+        res.json({
+            success: true,
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name
+            }
+        });
     }
     catch (error) {
         console.error("LOGIN ERROR:", error);
@@ -199,127 +215,118 @@ export const forgotPassword = async (req, res) => {
     try {
         const users = getUsersCollection();
         const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).json({
-                message: "Email and password cannot be empty."
-            })
-        }
-
-        if (!isValidEmail(email)) {
-            return res.status(400).json({ message: "Email is not valid" });
-        }
+        if (!email) return res.status(400).json({ message: "Email is required" });
 
         const user = await users.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        // Rate-limit OTP
+        if (user.resetPasswordExpires && user.resetPasswordExpires > Date.now() - 60000)
+            return res.status(429).json({ message: "Wait 1 minute before requesting another OTP" });
 
         const otp = generateOTP();
+        const hashedOtp = await bcrypt.hash(otp, 10);
+        const resetRequestId = createReqID();
 
         await users.updateOne(
             { _id: user._id },
             {
                 $set: {
-                    resetPasswordToken: otp,
-                    resetPasswordExpires: Date.now() + 2 * 60 * 1000
+                    resetPasswordToken: hashedOtp,
+                    resetPasswordExpires: Date.now() + 2 * 60 * 1000,
+                    resetRequestId
                 }
             }
         );
 
-        await sendEmail(
-            email,
-            otp
-        );
+        await sendEmail(email, otp);
 
-        res.json({
-            message: "Reset OTP sent"
-        });
+        res.cookie("resetRequestId", resetRequestId, resetCookieOptions);
 
+        res.json({ message: "Reset OTP sent" });
+    } catch (err) {
+        console.error("FORGOT PASSWORD ERROR:", err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-    catch (error) {
-        console.error("Forgot ERROR:", error);
-        res.status(500).json({ message: "Internal Server Error. Please try again." })
-    }
-}
+};
 
 export const verifyOTP = async (req, res) => {
     try {
         const users = getUsersCollection();
         const { email, otp } = req.body;
+        const resetRequestId = req.cookies.resetRequestId;
 
-        if (!email) {
-            return res.status(400).json({
-                message: "Email and password cannot be empty."
-            })
-        }
-
-        if (!isValidEmail(email)) {
-            return res.status(400).json({ message: "Email is not valid" });
-        }
+        if (!email || !otp || !resetRequestId)
+            return res.status(400).json({ message: "All fields are required" });
 
         const user = await users.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+        if (!user.resetPasswordToken || !user.resetPasswordExpires || user.resetRequestId !== resetRequestId)
+            return res.status(403).json({ message: "Invalid OTP request" });
 
-        if (
-            user.resetPasswordToken !== otp ||
-            user.resetPasswordExpires < Date.now()
-        ) {
-            return res.status(400).json({ message: "Invalid or expired OTP" });
-        }
+        if (user.resetPasswordExpires < Date.now())
+            return res.status(410).json({ message: "OTP expired" });
+
+        const isValidOtp = await bcrypt.compare(otp, user.resetPasswordToken);
+        if (!isValidOtp) return res.status(400).json({ message: "Invalid OTP" });
+
+        // OTP valid → issue reset JWT
+        const resetToken = jwt.sign(
+            { id: user._id.toString(), resetRequestId },
+            process.env.RESET_PASSWORD_JWT_SECRET,
+            { expiresIn: "5m" }
+        );
 
         await users.updateOne(
             { _id: user._id },
-            {
-                $set: {
-                    resetPasswordExpires: Date.now() + 5 * 60 * 1000
-                }
-            }
+            { $set: { resetPasswordToken: null, resetPasswordExpires: null } }
         );
 
-        res.json({
-            message: "Account verified successfully"
-        });
+        res.clearCookie("resetRequestId", resetCookieOptions)
+        res.cookie("resetToken", resetToken, resetCookieOptions);
+
+        res.json({ message: "OTP verified" });
+    } catch (err) {
+        console.error("VERIFY OTP ERROR:", err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-    catch (error) {
-        console.error("Forgot ERROR:", error);
-        res.status(500).json({ message: "Internal Server Error. Please try again." })
-    }
-}
+};
 
 export const resetPassword = async (req, res) => {
+    try {
+        const users = getUsersCollection();
+        const { newPassword } = req.body;
+        const resetToken = req.cookies.resetToken;
 
-    const users = getUsersCollection();
-    const { email, otp, newPassword } = req.body;
+        if (!resetToken || !newPassword)
+            return res.status(400).json({ message: "All fields are required" });
 
-    const user = await users.findOne({ email });
-
-    if (
-        user.resetPasswordToken !== otp ||
-        user.resetPasswordExpires < Date.now()
-    ) {
-        return res.status(400).json({ message: "Invalid OTP" });
-    }
-
-    const password = await bcrypt.hash(newPassword, 12);
-
-    await users.updateOne(
-        { _id: user._id },
-        {
-            $set: {
-                password,
-                resetPasswordToken: null,
-                resetPasswordExpires: null,
-            }
+        let decoded;
+        try {
+            decoded = jwt.verify(resetToken, process.env.RESET_PASSWORD_JWT_SECRET);
+        } catch (err) {
+            return res.status(403).json({ message: "Invalid or expired token" });
         }
-    );
+        
+        const user = await users.findOne({ _id: new ObjectId(decoded.id) });
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json({
-        message: "Password reset successful"
-    });
+        if (!user.resetRequestId || decoded.resetRequestId !== user.resetRequestId)
+            return res.status(403).json({ message: "Reset session mismatch" });
 
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+        await users.updateOne(
+            { _id: user._id },
+            { $set: { password: hashedPassword, resetRequestId: null } }
+        );
+
+        res.clearCookie("resetToken", resetCookieOptions);
+
+        res.json({ message: "Password reset successful" });
+    } catch (err) {
+        console.error("RESET PASSWORD ERROR:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 };

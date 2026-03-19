@@ -9,7 +9,11 @@ import styled from "@emotion/styled";
 
 import RoundButton from "../../components/common/RoundButton";
 
-const CustomInput = styled(TextField) ({
+import { useVerifyOTPMutation } from "../../app/services/auth/authAPI";
+
+import { useNavigate } from "react-router-dom";
+
+const CustomInput = styled(TextField)({
     "& .MuiOutlinedInput-root": {
         borderRadius: 30,
         height: 52,
@@ -29,6 +33,9 @@ const CustomInput = styled(TextField) ({
 })
 
 export default function OtpVerification() {
+
+    const [verifyOtp, { isLoading }] = useVerifyOTPMutation();
+    const navigate = useNavigate();
 
     const [otp, setOtp] = useState(["", "", "", ""]);
     const [error, setError] = useState("");
@@ -64,19 +71,34 @@ export default function OtpVerification() {
             if (newOtp[index]) {
                 newOtp[index] = ""; // clear current box
                 setOtp(newOtp);
-            } 
+            }
         }
     };
 
-    const verifyCode = () => {
+    const verifyCode = async () => {
 
         if (otp.some(value => value === "")) {
             setError("Please fill all fields");
             setOpenAlert(true);
             return;
         }
-        
-        alert("Verifying code");
+
+        const otpCode = otp.join("");
+        try {
+            let email = localStorage.getItem("email");
+            console.log(email)
+            localStorage.clear();
+            await verifyOtp({ email, otp: otpCode }).unwrap();
+            alert("Code verified successfully");
+            navigate("/resetpassword");
+        } catch (err) {
+            setError(err?.data?.message || "Invalid code");
+            setOpenAlert(true);
+
+            if( err?.data?.code === "OTP_EXPIRED" ) {
+                navigate("/forgotpassword");
+            }
+        }
     }
 
     return (
@@ -85,21 +107,22 @@ export default function OtpVerification() {
             <Typography variant="h3" >Verification Code</Typography>
 
             <Typography variant="body2">
-                We sent you a verification code on 
-                <Typography sx={{ fontWeight: 700 }} variant="body 2">...abc@gmail.com</Typography>
+                We sent you a verification code on
+                <Typography sx={{ fontWeight: 700 }} variant="body2">...abc@gmail.com</Typography>
             </Typography>
 
             <Stack spacing={2} sx={{ paddingY: 2 }} >
-                
+
                 <Stack direction="row" spacing={2} >
 
                     {
                         otp.map((value, index) => (
-                            <CustomInput 
+                            <CustomInput
+                                key={index}
                                 error={error && !value}
                                 id={`otp-${index}`}
-                                placeholder="0" 
-                                type="text" 
+                                placeholder="0"
+                                type="text"
                                 value={value}
                                 onChange={e => handleChange(index, e)}
                                 onKeyDown={e => handleKeyDown(index, e)}
@@ -107,15 +130,15 @@ export default function OtpVerification() {
                         ))
                     }
                 </Stack>
-                
+
                 <Typography sx={{ textAlign: "end" }} variant="body2">
                     Resend Code in:{" "}
                     <Typography sx={{ fontWeight: 700 }} variant="body 2">00:24</Typography>
                 </Typography>
 
             </Stack>
-            <RoundButton text="Verify Code" clickHandler={verifyCode} />
-            
+            <RoundButton text={ isLoading ? "Verifying" : "Verify Code" } disabled={isLoading} clickHandler={verifyCode} />
+
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 open={openAlert}
@@ -127,6 +150,6 @@ export default function OtpVerification() {
                 </Alert>
             </Snackbar>
 
-        </Stack> 
+        </Stack>
     )
 }
